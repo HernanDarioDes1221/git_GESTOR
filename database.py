@@ -1,0 +1,69 @@
+import csv
+import config
+
+class Cliente:
+   
+    def __init__(self, dni, nombre, apellido ):
+        self.dni = dni
+        self.nombre = nombre
+        self.apellido = apellido 
+
+    def __str__(self):
+        return f"({self.dni}) {self.nombre} {self.apellido}"
+    
+    def to_dict(self):
+        return {'dni':self.dni, 'nombre':self.nombre, 'apellido':self.apellido}
+
+
+class Clientes: 
+
+# Creamos un metodo estatico para establecer la lista de clientes con el metodo @staticmethod
+
+    lista = []
+
+    with open(config.DATABASE_PATH, newline='\n') as fichero:
+        reader = csv.reader(fichero, delimiter=';')
+        for dni, nombre, apellido in reader:
+            cliente = Cliente(dni, nombre, apellido)
+            lista.append(cliente)
+
+    @staticmethod
+    def buscar(dni):
+        for cliente in Clientes.lista:
+            if cliente.dni == dni: 
+                return cliente
+            
+    @staticmethod
+    def crear (dni, nombre, apellido):
+        cliente = Cliente(dni, nombre, apellido)
+        #Luego agregamos el cliente a la base de datos con la funcion append
+        Clientes.lista.append(cliente)
+        Clientes.guardar()
+        return cliente
+
+    @staticmethod
+    def modificar(dni, nombre, apellido):
+        for indice, cliente in enumerate(Clientes.lista):
+            if cliente.dni == dni:
+                Clientes.lista[indice].nombre = nombre
+                Clientes.lista[indice].apellido = apellido
+                Clientes.guardar()
+                return Clientes.lista[indice]
+
+    @staticmethod
+    def borrar(dni):
+        for indice, cliente in enumerate(Clientes.lista):
+            if cliente.dni == dni:
+                cliente = Clientes.lista.pop(indice)
+                Clientes.guardar()
+                #Con la funcion pop se borra el cliente que estemos buscando 
+                return cliente
+            
+
+
+    @staticmethod
+    def guardar():
+        with open(config.DATABASE_PATH, 'w', newline='\n') as fichero:
+            writer = csv.writer(fichero, delimiter=';')
+            for cliente in Clientes.lista:
+                writer.writerow((cliente.dni, cliente.nombre, cliente.apellido))
