@@ -1,2 +1,3 @@
-tests
+*.lock
 requirements
+*.pyc
