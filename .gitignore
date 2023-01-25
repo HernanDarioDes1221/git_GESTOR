@@ -1,3 +1,4 @@
-*.lock
 requirements
 *.pyc
+Pipfile.lock
+_pycache_
